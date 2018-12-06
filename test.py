@@ -11,8 +11,8 @@ import numpy as np
 if __name__=='__main__':
 
 
-    rel_filename = 'cacm/cacm.rel'
-    query_filename = 'cacm/cacm.qry'
+    rel_filename = 'data/cacm/cacm.rel'
+    query_filename = 'data/cacm/cacm.qry'
 
     index = Index()
 
@@ -40,8 +40,8 @@ if __name__=='__main__':
         q = QueryParser(rel_filename)
         q.q.initFile(query_filename)
         queries = []
-        # while True:
-        for i in range(4):
+        while True:
+        # for i in range(4):
             query = q.nextQuery()
             if query is None:
                 break

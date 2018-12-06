@@ -37,7 +37,7 @@ if __name__=='__main__':
     # models_names = ['Vectoriel', 'Okapi', 'LanguageModel', 'HITS', 'PageRank']
 
 
-    glouton = DiversityClustering(RandomClustering, index)
+    diversity = DiversityClustering(RandomClustering, index)
 
     models_scores = {}
 
@@ -47,8 +47,9 @@ if __name__=='__main__':
         q = QueryParser(relevants_file)
         q.q.initFile(query_file)
         predicted_docs = []
+
         # while True:
-        for i in range(1):
+        for i in range(3):
             query = q.nextQuery()
             if query is None:
                 break
@@ -56,16 +57,16 @@ if __name__=='__main__':
                 print('No relevants docs')
                 continue
 
+
             docs_scores = model.getRanking(query.getText())
             query_pred = IRList(query, docs_scores)
 
-            ordered_pred = glouton.order_pred(query, docs_scores)
 
-            predicted_docs.append(query_pred)
+            ordered_pred = diversity.order_pred(query, docs_scores)
+            ordered_query_pred = IRList(query, ordered_pred)
 
-
-
-
+            # predicted_docs.append(query_pred)
+            predicted_docs.append(ordered_query_pred)
 
         models_scores[name] = EvalIRModel(measures=['CR@20', 'P@20', 'AveragePrecision']).eval_model(predicted_docs)
         # models_scores[name] = EvalIRModel().eval_model(predicted_docs)
