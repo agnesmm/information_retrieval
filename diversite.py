@@ -1,5 +1,8 @@
 import abc
+from collections import Counter
 from random import randint
+from utils import roundrobin
+import operator
 
 from modeles import IRmodel
 
@@ -30,6 +33,8 @@ class RandomClustering(Clustering):
         return cluster
 
 
+
+
 class DiversityClustering(IRmodel):
     def __init__(self, clustering, index):
         super(DiversityClustering, self).__init__(index)
@@ -44,21 +49,31 @@ class DiversityClustering(IRmodel):
     def similarity(self, docId, pivot):
         pass
 
-    def order_pred(self, query, docs_scores):
+    def order_pred(self, query, docs_scores, cluster_order='docs_count'):
+        # def un ordre des docs par cluster
+
         clusters = self.clusters
         docs_ranked = []
 
         docsIds = [docId for docId,_ in docs_scores]
         docs_clusters = [clusters[docId] for docId in docsIds]
-        exit()
 
-        while len(docs_ranked) < len(docsIds):
-            for cluster in docs_clusters:
-                for docId in docsIds:
-                    if docId not in docs_ranked and clusters[docId]==cluster:
-                        docs_ranked.append(docId)
-                        print(len(docs_ranked))
-        return docs_ranked
+        if cluster_order=='docs_count':
+            ordered_clusters = sorted(Counter(docs_clusters).items(),
+                                      key=operator.itemgetter(1),
+                                      reverse=True)
+            ordered_clusters = [cluster_id for cluster_id, cluster_freq in ordered_clusters]
+
+        else:
+            print('implement cluster order!!')
+            exit()
+
+        docs_grouped_by_clusters = []
+        for cluster_id in ordered_clusters:
+            docs_grouped_by_clusters.append([d for d,c in clusters.items() if c==cluster_id])
+
+        return list(roundrobin(*docs_grouped_by_clusters))
+
 
 
 class Glouton(IRmodel):

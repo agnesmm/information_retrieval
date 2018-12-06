@@ -61,8 +61,6 @@ if __name__=='__main__':
 
             ordered_pred = glouton.order_pred(query, docs_scores)
 
-            exit()
-
             predicted_docs.append(query_pred)
 
 
