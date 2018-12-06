@@ -1,0 +1,9 @@
+*.pyc
+__pycache__/
+data
+cours
+.ipynb_checkpoints/
+.DS_Store
+sagecopy
+svm_rank
+tme_cours
