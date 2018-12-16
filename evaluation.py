@@ -74,6 +74,7 @@ class CR20(EvalMeasure):
         pred_docs = [int(d[0]) for d in l.doc_scores][:20]
         predicted_subtopic = list(set([r['idSubtopic'] for r in l.query.relevants if r['doc_id'] in pred_docs]))
 
+        print('relevant_subtopic = %d // predicted_subtopic = %d'%(subtopic_count, len(predicted_subtopic)))
 
         cr20 = len(predicted_subtopic) / float(subtopic_count)
         return cr20
