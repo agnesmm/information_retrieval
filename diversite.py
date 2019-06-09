@@ -38,12 +38,12 @@ class RandomClustering(Clustering):
         return {docId: randint(0, n_clusters) for docId in docs_ids}
 
 class KmeanClustering(Clustering):
-    def __init__(self, index, n_clusters=10):
+    def __init__(self, index, n_clusters=20):
         super(KmeanClustering, self).__init__(index)
         self.clustering_algo = KMeans(n_clusters=n_clusters)
 
 class DBSCANClustering(Clustering):
-    def __init__(self, index, eps=.3, min_samples=3):
+    def __init__(self, index, eps=.3, min_samples=1):
         super(DBSCANClustering, self).__init__(index)
         self.clustering_algo = DBSCAN(eps=eps, min_samples=min_samples)
 
@@ -56,9 +56,9 @@ class WithoutClustering(Clustering):
         return {doc_id: i for i, doc_id in enumerate(docs_ids)}
 
 class DiversityClustering(IRmodel):
-    def __init__(self, clustering, index, N=100):
+    def __init__(self, clustering, index, N=100, clustering_args={}):
         super(DiversityClustering, self).__init__(index)
-        self.clustering = clustering(index)
+        self.clustering = clustering(index, **clustering_args)
         self.N = N #nbr of docs to cluster
         # quel clustering choisir ? pourquoi ? tester pls clustering
         # par exemple prendre un intervalle et faire un pas pour le k
@@ -96,7 +96,7 @@ class DiversityClustering(IRmodel):
                   reverse=False)
         return [doc_id for doc_id, doc_freq in ordered_docs]
 
-    def order_pred(self, query, docs_scores, cluster_order='docs_count'):
+    def order_pred(self, query, docs_scores, cluster_order='relevance'):
         docs_to_cluster = [doc_id for (doc_id, _) in docs_scores[:self.N]]
         clusters = self.clustering.cluster_documents(docs_to_cluster)
         docs_ranked = []
@@ -114,10 +114,7 @@ class DiversityClustering(IRmodel):
         docs_grouped_by_clusters = []
         for cluster_id in ordered_clusters:
             clusters_docs = [d for d,c in clusters.items() if c==cluster_id]
-            print(clusters_docs)
             clusters_docs_ordered = self.order_docs_by_relevance(clusters_docs, docs_scores)
-            print(clusters_docs_ordered)
-            exit()
             docs_grouped_by_clusters.append(clusters_docs_ordered)
 
         ordered_docs = list(roundrobin(*docs_grouped_by_clusters))
